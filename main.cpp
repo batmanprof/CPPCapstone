@@ -1,5 +1,12 @@
-#include <iostream>
+#include "screen.h"
 
 int main() {
-  std::cout<<"Hello World!"<<std::endl;
+
+    Screen::InitNCurses();
+    Screen screen(15);
+
+    screen.loop();
+
+    Screen::DeInitNCurses();
+    return 0;
 }
