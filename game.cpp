@@ -164,3 +164,6 @@ std::vector<Point> Game::getWinnerCells(){
     return res;
 }
 
+const std::vector<std::vector<Value>> &Game::getGrid(){
+    return grid;
+}

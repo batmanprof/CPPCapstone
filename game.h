@@ -27,6 +27,7 @@ public:
   Value getNext();
   Value getWinner();
   std::vector<Point> getWinnerCells();
+  const std::vector<std::vector<Value>> &getGrid();
 
 private:
   int N;
