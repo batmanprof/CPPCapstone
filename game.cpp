@@ -14,6 +14,8 @@ Game::Game(int n, int wn):
   {}
 
 Value Game::move(int x, int y){
+    assert(x>=0 && x<N);       //ERROR: Wrong x value.
+    assert(y>=0 && y<N);       //ERROR: Wrong y value.
     assert(winner==0);         //ERROR: The game has already ended.
     assert(grid[x][y]==None);  //ERROR: The square is already occupied.
     grid[x][y]=next;
@@ -127,6 +129,12 @@ bool Game::check_win(int x, int y, Value curr){
     }
 
     return false;
+}
+
+Value Game::getValue(int x, int y){
+    assert(x>=0 && x<N);       //ERROR: Wrong x value.
+    assert(y>=0 && y<N);       //ERROR: Wrong y value.
+    return grid[x][y];
 }
 
 int Game::size(){

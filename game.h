@@ -21,6 +21,7 @@ public:
   Value move(int x, int y);
   void unmove();
   bool check_win(int x, int y, Value curr);
+  Value getValue(int x, int y);
   int size();
   bool ended();
   Value getNext();

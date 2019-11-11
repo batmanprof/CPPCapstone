@@ -106,6 +106,7 @@ void Screen::waitForQuit(){
     mvprintw(N+4,0,"Press 'q' to quit.           ");
     mvprintw(N+5,0,"                             ");
     mvprintw(N+6,0,"                             ");
+    move(0,0);
     refresh();
 
     while(true){
@@ -140,6 +141,9 @@ void Screen::loop(){
         } else if (key==32){
             int x,y;
             getyx(win,y,x);
+            if (game.getValue(x-1,y-1)!=None) {
+                continue;
+            }
             int cc='X';
             if (game.getNext()==O){
                 cc='O';
