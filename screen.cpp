@@ -6,7 +6,7 @@
 #include <ncurses.h>
 
 
-Screen::Screen(int N):N(N){
+Screen::Screen(Game &game):game(game),N(game.size()){
     //Letters - horizontal
     printw("   ");
     for(int i=0;i<N;i++) {
@@ -20,9 +20,9 @@ Screen::Screen(int N):N(N){
             mvprintw(i+1,0,std::to_string(i).c_str());
         }
     }
-    mvprintw(N+3,0,"Use arrow-keys and");
-    mvprintw(N+4,0,"space-key to play.");
-    mvprintw(N+5,0,"Press 'q' to quit.");
+    mvprintw(N+4,0,"Use arrow-keys and");
+    mvprintw(N+5,0,"space-key to play.");
+    mvprintw(N+6,0,"Press 'q' to quit.");
     refresh();
 
     //Create the play area as window
@@ -33,12 +33,10 @@ Screen::Screen(int N):N(N){
     wrefresh(win);		
 }
 
-void Screen::loop(){
-    bool quit = false;
-    while(!quit) {	
+int Screen::getNextStep(){
+    while(true){
         int x,y;
         int c;
-        int cc;
         c = getch();
         switch(c) {	
             case KEY_UP:
@@ -73,24 +71,73 @@ void Screen::loop(){
                     wrefresh(win);
                 }
                 break;
-            case 32:           
-                getyx(win,y,x);
-                cc = mvwinch(win,y,x);
-                if (cc=='X') {
-                    cc=' ';
-                } else {
-                    cc='X';
-                }
-                waddch(win,cc);
-                wmove(win,y,x);
-                wrefresh(win);
-                break;
+            case 32:  //space         
             case 113: //'q'
             case 81:  //'Q'
-                quit = true;
+                return c;
                 break;
         }
-    }	
+        
+    }
+}
+
+void Screen::printStatus(){
+    int x,y;
+    getyx(win,y,x);
+
+    if (game.getWinner()==X){
+        mvprintw(N+3,0,"X won.                     ");
+    } else if (game.getWinner()==O){
+        mvprintw(N+3,0,"O won.                     ");
+    } else if (game.getWinner()==Draw){
+        mvprintw(N+3,0,"Draw.                      ");
+    } else if (game.getNext()==X){
+        mvprintw(N+3,0,"Next: X.                   ");
+    } else {
+        mvprintw(N+3,0,"Next: O.                   ");
+    }
+    refresh();
+
+    wmove(win,y,x);
+    wrefresh(win);
+}
+
+void Screen::waitForQuit(){
+    mvprintw(N+4,0,"Press 'q' to quit.           ");
+    mvprintw(N+5,0,"                             ");
+    mvprintw(N+6,0,"                             ");
+    refresh();
+
+    while(true){
+        int c;
+        c = getch();
+        if (c==81 || c==113) {
+            return;
+        }
+    }
+}
+
+void Screen::loop(){
+    while (!game.ended()){
+        printStatus();
+        int key = getNextStep();
+        if (key==81 || key==113) {
+            return;
+        } else if (key==32){
+            int x,y;
+            getyx(win,y,x);
+            int cc='X';
+            if (game.getNext()==O){
+                cc='O';
+            }
+            waddch(win,cc);
+            wmove(win,y,x);
+            wrefresh(win);
+            game.move(x-1,y-1);
+        }
+    }
+    printStatus();
+    waitForQuit();    
 }
 
 Screen::~Screen(){

@@ -1,0 +1,147 @@
+#include "game.h"
+
+#include <cassert>
+
+Game::Game(int n, int wn):
+  N(n),
+  NN(n*n),
+  WN(wn),
+  nr(0),
+  grid( std::vector<std::vector<Value>>(N,std::vector<Value>(N,None)) ),
+  moves( std::vector<Point>()),
+  winner(None),
+  next(X)
+  {}
+
+Value Game::move(int x, int y){
+    assert(winner==0);         //ERROR: The game has already ended.
+    assert(grid[x][y]==None);  //ERROR: The square is already occupied.
+    grid[x][y]=next;
+    moves.push_back(Point(x,y));
+    nr++;
+    if (check_win(x,y,next)) {
+        winner=next;
+    } else if (nr==NN){
+        winner=Draw;
+    }
+    next = (next==X?O:X);
+    return winner;
+
+}
+
+void Game::unmove(){
+    assert(nr>0); //ERROR: Game not started, no move to undo.
+    nr-=1;
+    int x = moves[nr].x; 
+    int y = moves[nr].y;
+    grid[y][x]=None;
+    winner=None;
+    next = (next==X?O:X);
+}
+
+bool Game::check_win(int x, int y, Value curr){
+    int l;
+
+    //horizontal
+    l=1;
+    xx0=x;
+    yy0=y;
+    while(l<WN && xx0-1>=0 && grid[xx0-1][yy0]==curr){
+        xx0--;
+        l++;
+    }
+    xx1=x;
+    yy1=y;
+    while(l<WN && xx1+1<N && grid[xx1+1][yy1]==curr){
+        xx1++;
+        l++;
+    }
+    if (l>=WN) {
+        dx=1;
+        dy=0;
+        return true;
+    }
+
+    //vertical
+    l=1;
+    xx0=x;
+    yy0=y;
+    while(l<WN && yy0-1>=0 && grid[xx0][yy0-1]==curr){
+        yy0--;
+        l++;
+    }
+    xx1=x;
+    yy1=y;
+    while(l<WN && yy1+1<N && grid[xx1][yy1+1]==curr){
+        yy1++;
+        l++;
+    }
+    if (l>=WN) {
+        dx=0;
+        dy=1;
+        return true;
+    }
+
+    //diag: "\"
+    l=1;
+    xx0=x;
+    yy0=y;
+    while(l<WN && xx0-1>=0 && yy0-1>=0 && grid[xx0-1][yy0-1]==curr){
+        xx0--;
+        yy0--;
+        l++;
+    }
+    xx1=x;
+    yy1=y;
+    while(l<WN && xx1+1<N && yy1+1<N && grid[xx1+1][yy1+1]==curr){
+        xx1++;
+        yy1++;
+        l++;
+    }
+    if (l>=WN) {
+        dx=1;
+        dy=1;
+        return true;
+    }
+
+    //diag: "/"
+    l=1;
+    xx0=x;
+    yy0=y;
+    while(l<WN && xx0-1>=0 && yy0+1<N && grid[xx0-1][yy0+1]==curr){
+        xx0--;
+        yy0++;
+        l++;
+    }
+    xx1=x;
+    yy1=y;
+    while(l<WN && xx1+1<N && yy1-1>=0 && grid[xx1+1][yy1-1]==curr){
+        xx1++;
+        yy1--;
+        l++;
+    }
+    if (l>=WN) {
+        dx=1;
+        dy=-1;
+        return true;
+    }
+
+    return false;
+}
+
+int Game::size(){
+    return N;
+}
+
+bool Game::ended(){
+    return winner!=None; 
+}
+
+Value Game::getNext(){
+    return next;
+}
+
+Value Game::getWinner(){
+    return winner;
+}
+

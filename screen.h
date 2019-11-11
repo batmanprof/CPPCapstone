@@ -2,10 +2,10 @@
 #define FIVE_IN_A_RAW_SCREEN
  
 #include <ncurses.h>
-
+#include "game.h"
 class Screen {
 public:
-    Screen(int N=15);
+    Screen(Game &game);
     void loop();
     ~Screen();
 
@@ -15,6 +15,11 @@ public:
 private:
     int N;
     WINDOW *win;
+    Game &game;
+
+    int getNextStep();
+    void printStatus();
+    void waitForQuit();
 };
 
 #endif
