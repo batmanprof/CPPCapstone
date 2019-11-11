@@ -7,6 +7,49 @@
 
 
 Screen::Screen(Game &game):game(game),N(game.size()){
+    int c;
+
+    clear();
+    mvprintw(0,0,"Select X player:");
+    mvprintw(1,0,"1 - Human");
+    mvprintw(2,0,"2 - AI (Random)");
+    mvprintw(3,0,"3 - AI (RandomClose)");
+    move(4, 0);
+    refresh();
+    while (true){
+        c = getch();
+        if (c=='1' or c=='2' or c=='3') {
+            break;
+        }
+    }
+    if (c=='2') {
+        aiX = std::make_unique<AIRandomAll>();
+    } else if (c=='3') {
+        aiX = std::make_unique<AIRandomClose>();
+    }
+
+    mvprintw(4,0,"Select O player:");
+    mvprintw(5,0,"1 - Human");
+    mvprintw(6,0,"2 - AI (Random)");
+    mvprintw(7,0,"3 - AI (RandomClose)");
+    move(8, 0);
+    refresh();
+    while (true){
+        c = getch();
+        if (c=='1' or c=='2' or c=='3') {
+            break;
+        }
+    }
+    if (c=='2') {
+        aiO = std::make_unique<AIRandomAll>();
+    } else if (c=='3') {
+        aiO = std::make_unique<AIRandomClose>();
+    }
+
+
+    clear();
+    refresh();
+
     //Letters - horizontal
     printw("   ");
     for(int i=0;i<N;i++) {
@@ -20,6 +63,7 @@ Screen::Screen(Game &game):game(game),N(game.size()){
             mvprintw(i+1,0,std::to_string(i).c_str());
         }
     }
+
     mvprintw(N+4,0,"Use arrow-keys and");
     mvprintw(N+5,0,"space-key to play.");
     mvprintw(N+6,0,"Press 'q' to quit.");
@@ -132,12 +176,11 @@ void Screen::showWinner(){
 
 }
 
-void Screen::loop(){
-    while (!game.ended()){
-        printStatus();
+bool Screen::processPlayerStep(){
+    while (true) {
         int key = getNextStep();
         if (key==81 || key==113) {
-            return;
+            return true;
         } else if (key==32){
             int x,y;
             getyx(win,y,x);
@@ -152,6 +195,38 @@ void Screen::loop(){
             wmove(win,y,x);
             wrefresh(win);
             game.move(x-1,y-1);
+            break;
+        }
+    }
+    return false;
+}
+
+void Screen::processAIStep(int x, int y){
+    int cc='X';
+    if (game.getNext()==O){
+        cc='O';
+    }
+    wmove(win,y+1,x+1);
+    waddch(win,cc);
+    wmove(win,y+1,x+1);
+    wrefresh(win);
+    game.move(x,y);
+}
+
+void Screen::screenLogic(){
+    while (!game.ended()){
+        printStatus();
+        if (game.getNext()==X && aiX) {
+            Point p = aiX->nextMove(game.getGrid(), X);
+            processAIStep(p.x,p.y);
+        } else if (game.getNext()==O && aiO) {
+            Point p = aiO->nextMove(game.getGrid(), O);
+            processAIStep(p.x,p.y);
+        } else {
+            bool exit = processPlayerStep();
+            if (exit) {
+                return;
+            }
         }
     }
     showWinner();

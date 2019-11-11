@@ -8,7 +8,7 @@ int main() {
     Game game(15,5);
     Screen screen(game);
 
-    screen.loop();
+    screen.screenLogic();
 
     Screen::DeInitNCurses();
     return 0;
