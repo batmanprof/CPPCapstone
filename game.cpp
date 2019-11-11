@@ -145,3 +145,14 @@ Value Game::getWinner(){
     return winner;
 }
 
+std::vector<Point> Game::getWinnerCells(){
+    assert(winner!=0); //ERROR: The game is not ended yet.
+    int x,y;
+    std::vector<Point> res;
+    for(x=xx0, y=yy0;x!=xx1 || y!=yy1; x+=dx, y+=dy){
+        res.push_back(Point(x,y));
+    }
+    res.push_back(Point(x,y));
+    return res;
+}
+

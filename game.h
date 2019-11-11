@@ -25,6 +25,7 @@ public:
   bool ended();
   Value getNext();
   Value getWinner();
+  std::vector<Point> getWinnerCells();
 
 private:
   int N;

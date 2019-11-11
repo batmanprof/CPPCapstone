@@ -20,6 +20,7 @@ private:
     int getNextStep();
     void printStatus();
     void waitForQuit();
+    void showWinner();
 };
 
 #endif

@@ -117,6 +117,20 @@ void Screen::waitForQuit(){
     }
 }
 
+void Screen::showWinner(){
+    wattron(win,COLOR_PAIR(1) );
+    std::vector<Point> winnerCells = game.getWinnerCells();
+    for(Point p : winnerCells){
+        wmove(win,p.y+1,p.x+1);
+        int cc=winch(win);
+        waddch(win,cc);
+        wrefresh(win);
+
+    }
+    wattroff(win,A_BLINK);
+
+}
+
 void Screen::loop(){
     while (!game.ended()){
         printStatus();
@@ -136,6 +150,7 @@ void Screen::loop(){
             game.move(x-1,y-1);
         }
     }
+    showWinner();
     printStatus();
     waitForQuit();    
 }
@@ -150,6 +165,8 @@ void Screen::InitNCurses(){
     noecho();
     curs_set(1);
     keypad(stdscr, TRUE);
+    start_color();
+    init_pair(1, COLOR_RED, COLOR_BLACK);
 }
 
 void Screen::DeInitNCurses(){
