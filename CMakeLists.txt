@@ -11,6 +11,6 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # add the executable
-add_executable(five_in_a_row main.cpp screen.h screen.cpp game.h game.cpp ai.h ai.cpp)
+add_executable(five_in_a_row main.cpp screen.h screen.cpp game.h game.cpp ai.h ai.cpp mcts.h mcts.cpp params.h)
 target_link_libraries(five_in_a_row ${CURSES_LIBRARIES})
 
