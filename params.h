@@ -3,9 +3,7 @@
 
 namespace prm {
     double MCTS_U_COEFF = 1.41;
-
-
-
+    int MCTS_NR = 1000;
 }
 
 #endif

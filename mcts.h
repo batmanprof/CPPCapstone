@@ -35,7 +35,7 @@ class MCTS {
 public:
     MCTS(const Game &game, std::unique_ptr<Node> root_node=nullptr, double MCTS_U_COEFF = prm::MCTS_U_COEFF);
 
-    void select_move(bool competitive=false);
+    Point select_move(bool competitive=true, int nr=prm::MCTS_NR);
     void extend_update();
 
 private:

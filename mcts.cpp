@@ -1,6 +1,7 @@
 #include <cmath>
 
 #include "mcts.h"
+#include "ai.h"
 
 
 MCTS::MCTS(const Game &game, std::unique_ptr<Node> root_node,double MCTS_U_COEFF)
@@ -10,7 +11,29 @@ MCTS::MCTS(const Game &game, std::unique_ptr<Node> root_node,double MCTS_U_COEFF
     }
 }
 
-void MCTS::select_move(bool competitive){
+Point MCTS::select_move(bool competitive, int nr){
+    for(int i=0;i<nr;++i){
+        extend_update();
+    }
+    if (competitive){
+        std::vector<Point> bests;
+        int maxN=-1;
+        for(auto &e:root_node->edges){
+            if (e->N>maxN){
+                maxN=e->N;
+                bests.clear();
+                bests.emplace_back(Point(e->act_x, e->act_y));
+            } else if (e->N==maxN){
+                bests.emplace_back(Point(e->act_x, e->act_y));
+            }
+        }
+
+        std::uniform_int_distribution<int> rnd(0,bests.size());
+        int index = rnd(gen);
+        return bests[index];
+    } else {
+    }
+    return Point();
 
 }
 void MCTS::extend_update(){
@@ -48,6 +71,9 @@ void MCTS::extend_update(){
     } else {  //Not terminating state
         //Estimating value (e.g with random play)
         value=estimate_value();
+        if (game.getNext()==O){
+            value = 1.0 - value;
+        }
         //Extending the graph
         extend_graph(curr);
     }
@@ -64,8 +90,32 @@ void MCTS::extend_update(){
 }
 
 double MCTS::estimate_value(){
-    return 1.0;
+    AIRandomAll rndai;
+    Point p; 
+    int move_nr=0;
+
+    while(game.getWinner()==None){
+        p=rndai.nextMove(game.getGrid(), game.getNext());
+        game.move(p.x,p.y);
+        move_nr++;
+    }
+
+    Value winner=game.getWinner();
+
+    for(int i=0;i<move_nr;++i){
+        game.unmove();
+    }
+
+    if (winner==X) {
+        return 1.0;
+    } else if (winner==O) {
+        return 0.0;
+    } else {
+        return Draw;
+    }
 }
+
+
 void MCTS::extend_graph(Node *curr){
     for(int x=0;x<game.size();++x) {
         for(int y=0;y<game.size();++y) {
