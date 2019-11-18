@@ -3,7 +3,7 @@
 
 struct prm {
     static constexpr double MCTS_U_COEFF = 1.41;
-    static constexpr int MCTS_NR = 1000;
+    static constexpr int MCTS_NR = 10000;
 };
 
 #endif

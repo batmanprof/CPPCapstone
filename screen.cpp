@@ -6,7 +6,7 @@
 #include <ncurses.h>
 
 
-Screen::Screen(Game &game):game(game),N(game.size()){
+Screen::Screen(Game &igame):game(igame),N(igame.size()){
     int c;
 
     clear();

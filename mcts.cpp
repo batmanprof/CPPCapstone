@@ -6,10 +6,10 @@
 #include "ai.h"
 
 
-MCTS::MCTS(const Game &game, std::unique_ptr<Node> root_node,double MCTS_U_COEFF)
-:game(game), root_node(std::move(root_node)),MCTS_U_COEFF(MCTS_U_COEFF),gen(rd()),N(1) {
-    if (!this->root_node) {
-        this->root_node = std::make_unique<Node>();
+MCTS::MCTS(const Game &game, std::unique_ptr<Node> i_root_node,double MCTS_U_COEFF)
+:game(game), root_node(std::move(i_root_node)),MCTS_U_COEFF(MCTS_U_COEFF),gen(rd()),N(1) {
+    if (!root_node) {
+        root_node = std::make_unique<Node>();
     }
     extend_graph(root_node.get()); 
 }
@@ -129,10 +129,8 @@ void MCTS::extend_graph(Node *curr){
             if (game.getValue(x,y) == None){
                 std::unique_ptr<Node> n=std::make_unique<Node>(); 
                 std::unique_ptr<Edge> e=std::make_unique<Edge>(x,y,std::move(n));
-std::cout<<"xxx"<<std::endl<<std::flush;
                 curr->edges.emplace_back(std::move(e));
-std::cout<<"zzz"<<std::endl<<std::flush;
             }
         }
-    }
+    } 
 }

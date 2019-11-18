@@ -11,6 +11,7 @@
 struct Edge;
 
 struct Node {
+    Node():edges(0){}
     std::vector<std::unique_ptr<Edge>> edges;
 };
 
@@ -33,7 +34,7 @@ struct Edge {
 
 class MCTS {
 public:
-    MCTS(const Game &game, std::unique_ptr<Node> root_node=nullptr, double MCTS_U_COEFF = prm::MCTS_U_COEFF);
+    MCTS(const Game &game, std::unique_ptr<Node> i_root_node=nullptr, double MCTS_U_COEFF = prm::MCTS_U_COEFF);
 
     Point select_move(bool competitive=true, int nr=prm::MCTS_NR);
 

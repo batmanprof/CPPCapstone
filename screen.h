@@ -9,7 +9,7 @@
 
 class Screen {
 public:
-    Screen(Game &game);
+    Screen(Game &igame);
     void screenLogic();
     ~Screen();
 
