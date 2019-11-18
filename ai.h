@@ -6,7 +6,7 @@
 
 class AI {
 public:
-    virtual Point nextMove(const std::vector<std::vector<Value>> &grid, Value next) = 0;
+    virtual Point nextMove(const Game &game) = 0;
 };
 
 class AIRandom : public AI {
@@ -20,16 +20,21 @@ protected:
 
 class AIRandomAll : public AIRandom {
 public:
-    Point nextMove(const std::vector<std::vector<Value>> &grid, Value next) override;
+    Point nextMove(const Game &game) override;
 
 };
 
 class AIRandomClose : public AIRandom {
 public:
-    Point nextMove(const std::vector<std::vector<Value>> &grid, Value next) override;
+    Point nextMove(const Game &game) override;
 private:
     bool checkNeighbors(const std::vector<std::vector<Value>> &grid, int x, int y, int N);
 };
 
+class AIMCTS : public AI {
+public:
+    Point nextMove(const Game &game) override;
+
+};
 
 #endif

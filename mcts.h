@@ -17,12 +17,12 @@ struct Node {
 struct Edge {
 
     Edge(int x, int y, std::unique_ptr<Node> node=nullptr):
-      N(0),W(0.0),Q(0.0),
+      N(1e-10),W(0.0),Q(0.0),
       act_x(x),act_y(y),
       result_node(std::move(node)) {}
 
 
-    int N;
+    double N;
     double W;
     double Q;
     int act_x;
@@ -36,16 +36,17 @@ public:
     MCTS(const Game &game, std::unique_ptr<Node> root_node=nullptr, double MCTS_U_COEFF = prm::MCTS_U_COEFF);
 
     Point select_move(bool competitive=true, int nr=prm::MCTS_NR);
-    void extend_update();
 
 private:
     int N; //Number of simulations
     std::unique_ptr<Node> root_node;
     Game game;
-    std::default_random_engine gen;
+    std::random_device rd;
+    std::mt19937 gen;
 
     const double MCTS_U_COEFF;
 
+    void extend_update();
     double estimate_value();
     void extend_graph(Node *curr);
 };

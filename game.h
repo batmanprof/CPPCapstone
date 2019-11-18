@@ -26,16 +26,15 @@ public:
   Value getValue(int x, int y);
   int size();
   bool ended();
-  Value getNext();
-  Value getWinner();
+  Value getNext() const;
+  Value getWinner() const;
   std::vector<Point> getWinnerCells();
-  const std::vector<std::vector<Value>> &getGrid();
+  const std::vector<std::vector<Value>> &getGrid() const;
 
 private:
   int N;
   int NN;
   int WN;
-  int nr;
   std::vector<std::vector<Value>> grid;
   std::vector<Point> moves;
   Value winner; 

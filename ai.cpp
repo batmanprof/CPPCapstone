@@ -1,6 +1,11 @@
-#include "ai.h"
+#include <iostream>
 
-Point AIRandomAll::nextMove(const std::vector<std::vector<Value>> &grid, Value next){
+#include "ai.h"
+#include "mcts.h"
+
+Point AIRandomAll::nextMove(const Game &game){
+    const std::vector<std::vector<Value>> &grid = game.getGrid();
+    Value next = game.getNext();
     std::vector<Point> v;
     for(int i=0;i<grid.size();i++){
         for(int j=0;j<grid[i].size();j++){
@@ -28,7 +33,9 @@ bool AIRandomClose::checkNeighbors(const std::vector<std::vector<Value>> &grid, 
     return false;
 }
 
-Point AIRandomClose::nextMove(const std::vector<std::vector<Value>> &grid, Value next){
+Point AIRandomClose::nextMove(const Game &game){
+    const std::vector<std::vector<Value>> &grid = game.getGrid();
+    Value next = game.getNext();
     std::vector<Point> v;
     int nr=0;
     for(int i=0;i<grid.size();i++){
@@ -47,4 +54,10 @@ Point AIRandomClose::nextMove(const std::vector<std::vector<Value>> &grid, Value
     std::uniform_int_distribution<> dist(0, v.size()-1);
     int i=dist(gen);
     return v[i];    
+}
+
+Point AIMCTS::nextMove(const Game &game){
+    MCTS mcts(game);
+    auto p = mcts.select_move();
+    return p;
 }

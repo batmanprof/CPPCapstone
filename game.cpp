@@ -1,13 +1,13 @@
 #include "game.h"
 
 #include <cassert>
+#include <iostream>
 
 Game::Game(int n, int wn):
   N(n),
   NN(n*n),
   WN(wn),
-  nr(0),
-  grid( std::vector<std::vector<Value>>(N,std::vector<Value>(N,None)) ),
+  grid( std::vector<std::vector<Value>>(n,std::vector<Value>(n,None)) ),
   moves( std::vector<Point>()),
   winner(None),
   next(X)
@@ -20,23 +20,20 @@ Value Game::move(int x, int y){
     assert(grid[x][y]==None);  //ERROR: The square is already occupied.
     grid[x][y]=next;
     moves.push_back(Point(x,y));
-    nr++;
     if (check_win(x,y,next)) {
         winner=next;
-    } else if (nr==NN){
+    } else if (moves.size()==NN){
         winner=Draw;
     }
     next = (next==X?O:X);
     return winner;
-
 }
 
 void Game::unmove(){
-    assert(nr>0); //ERROR: Game not started, no move to undo.
-    nr-=1;
-    int x = moves[nr].x; 
-    int y = moves[nr].y;
-    grid[y][x]=None;
+    assert(moves.size()>0); //ERROR: Game not started, no move to undo.
+    Point p=moves.back();
+    grid[p.x][p.y]=None;
+    moves.resize(moves.size()-1);
     winner=None;
     next = (next==X?O:X);
 }
@@ -145,11 +142,11 @@ bool Game::ended(){
     return winner!=None; 
 }
 
-Value Game::getNext(){
+Value Game::getNext() const {
     return next;
 }
 
-Value Game::getWinner(){
+Value Game::getWinner() const {
     return winner;
 }
 
@@ -164,6 +161,6 @@ std::vector<Point> Game::getWinnerCells(){
     return res;
 }
 
-const std::vector<std::vector<Value>> &Game::getGrid(){
+const std::vector<std::vector<Value>> &Game::getGrid() const {
     return grid;
 }

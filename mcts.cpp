@@ -1,20 +1,24 @@
 #include <cmath>
+#include <cassert>
+#include <iostream>
 
 #include "mcts.h"
 #include "ai.h"
 
 
 MCTS::MCTS(const Game &game, std::unique_ptr<Node> root_node,double MCTS_U_COEFF)
-:game(game), root_node(std::move(root_node)),MCTS_U_COEFF(MCTS_U_COEFF),gen(),N(0) {
-    if (root_node==nullptr) {
-        root_node = std::make_unique<Node>();
+:game(game), root_node(std::move(root_node)),MCTS_U_COEFF(MCTS_U_COEFF),gen(rd()),N(1) {
+    if (!this->root_node) {
+        this->root_node = std::make_unique<Node>();
     }
+    extend_graph(root_node.get()); 
 }
 
 Point MCTS::select_move(bool competitive, int nr){
     for(int i=0;i<nr;++i){
         extend_update();
     }
+
     if (competitive){
         std::vector<Point> bests;
         int maxN=-1;
@@ -28,7 +32,8 @@ Point MCTS::select_move(bool competitive, int nr){
             }
         }
 
-        std::uniform_int_distribution<int> rnd(0,bests.size());
+        assert(bests.size()!=0);
+        std::uniform_int_distribution<int> rnd(0,bests.size()-1);
         int index = rnd(gen);
         return bests[index];
     } else {
@@ -46,8 +51,8 @@ void MCTS::extend_update(){
     while(curr->edges.size()!=0){
         probs.clear();
         for(auto &e:curr->edges){
-            float Q = e->Q;
-            float U = MCTS_U_COEFF * std::sqrt(std::log(parentN)/(double)(e->N));
+            double Q = e->Q;
+            double U = MCTS_U_COEFF * std::sqrt(std::log(parentN)/e->N);
             probs.emplace_back(Q + U);
         }
         std::discrete_distribution<int> dist(probs.begin(), probs.end());
@@ -67,11 +72,12 @@ void MCTS::extend_update(){
     if (winner == X or winner == O) {
         value = 1.0;         //From the perspective of the player who has just played
     } else if (winner == Draw) { 
-        value = 0.5;            //From the perspective of the player who has just played
+        value = 0.5;         //From the perspective of the player who has just played
     } else {  //Not terminating state
         //Estimating value (e.g with random play)
-        value=estimate_value();
-        if (game.getNext()==O){
+        //From the perspective of the player who has just played
+        value=estimate_value(); 
+        if (game.getNext()==X){
             value = 1.0 - value;
         }
         //Extending the graph
@@ -80,7 +86,7 @@ void MCTS::extend_update(){
 
     //Update egdes back toward the root
     for(int i=route.size()-1;i>=0;--i){
-        route[i]->N++;
+        route[i]->N += 1.0;
         route[i]->W += value;
         route[i]->Q = route[i]->W / route[i]->N;
         value=1.0-value;
@@ -91,18 +97,19 @@ void MCTS::extend_update(){
 
 double MCTS::estimate_value(){
     AIRandomAll rndai;
+    //AIRandomClose rndai;
     Point p; 
     int move_nr=0;
 
     while(game.getWinner()==None){
-        p=rndai.nextMove(game.getGrid(), game.getNext());
+        p=rndai.nextMove(game);
         game.move(p.x,p.y);
         move_nr++;
     }
 
     Value winner=game.getWinner();
 
-    for(int i=0;i<move_nr;++i){
+    for(;move_nr>0;--move_nr){
         game.unmove();
     }
 
@@ -111,7 +118,7 @@ double MCTS::estimate_value(){
     } else if (winner==O) {
         return 0.0;
     } else {
-        return Draw;
+        return 0.5;
     }
 }
 
@@ -121,7 +128,10 @@ void MCTS::extend_graph(Node *curr){
         for(int y=0;y<game.size();++y) {
             if (game.getValue(x,y) == None){
                 std::unique_ptr<Node> n=std::make_unique<Node>(); 
-                curr->edges.emplace_back(new Edge(x,y,std::move(n)));
+                std::unique_ptr<Edge> e=std::make_unique<Edge>(x,y,std::move(n));
+std::cout<<"xxx"<<std::endl<<std::flush;
+                curr->edges.emplace_back(std::move(e));
+std::cout<<"zzz"<<std::endl<<std::flush;
             }
         }
     }

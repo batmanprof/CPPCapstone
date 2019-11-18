@@ -14,11 +14,12 @@ Screen::Screen(Game &game):game(game),N(game.size()){
     mvprintw(1,0,"1 - Human");
     mvprintw(2,0,"2 - AI (Random)");
     mvprintw(3,0,"3 - AI (RandomClose)");
-    move(4, 0);
+    mvprintw(4,0,"4 - AI (MCTS)");
+    move(5, 0);
     refresh();
     while (true){
         c = getch();
-        if (c=='1' or c=='2' or c=='3') {
+        if (c=='1' || c=='2' || c=='3' || c=='4') {
             break;
         }
     }
@@ -26,17 +27,20 @@ Screen::Screen(Game &game):game(game),N(game.size()){
         aiX = std::make_unique<AIRandomAll>();
     } else if (c=='3') {
         aiX = std::make_unique<AIRandomClose>();
+    } else if (c=='4') {
+        aiX = std::make_unique<AIMCTS>();
     }
 
-    mvprintw(4,0,"Select O player:");
-    mvprintw(5,0,"1 - Human");
-    mvprintw(6,0,"2 - AI (Random)");
-    mvprintw(7,0,"3 - AI (RandomClose)");
-    move(8, 0);
+    mvprintw(5,0,"Select O player:");
+    mvprintw(6,0,"1 - Human");
+    mvprintw(7,0,"2 - AI (Random)");
+    mvprintw(8,0,"3 - AI (RandomClose)");
+    mvprintw(9,0,"4 - AI (MCTS)");
+    move(10, 0);
     refresh();
     while (true){
         c = getch();
-        if (c=='1' or c=='2' or c=='3') {
+        if (c=='1' || c=='2' || c=='3' || c=='4') {
             break;
         }
     }
@@ -44,6 +48,8 @@ Screen::Screen(Game &game):game(game),N(game.size()){
         aiO = std::make_unique<AIRandomAll>();
     } else if (c=='3') {
         aiO = std::make_unique<AIRandomClose>();
+    } else if (c=='4') {
+        aiO = std::make_unique<AIMCTS>();
     }
 
 
@@ -217,10 +223,10 @@ void Screen::screenLogic(){
     while (!game.ended()){
         printStatus();
         if (game.getNext()==X && aiX) {
-            Point p = aiX->nextMove(game.getGrid(), X);
+            Point p = aiX->nextMove(game);
             processAIStep(p.x,p.y);
         } else if (game.getNext()==O && aiO) {
-            Point p = aiO->nextMove(game.getGrid(), O);
+            Point p = aiO->nextMove(game);
             processAIStep(p.x,p.y);
         } else {
             bool exit = processPlayerStep();
