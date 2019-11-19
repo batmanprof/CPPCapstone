@@ -5,7 +5,7 @@ int main() {
 
     Screen::InitNCurses();
 
-    Game game(7,4);
+    Game game(9,5);
     Screen screen(game);
 
     screen.screenLogic();

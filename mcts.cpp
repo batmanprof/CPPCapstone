@@ -52,7 +52,13 @@ void MCTS::extend_update(){
         probs.clear();
         for(auto &e:curr->edges){
             double Q = e->Q;
-            double U = MCTS_U_COEFF * std::sqrt(std::log(parentN)/e->N);
+            double U = 0.0;
+            if (e->N!=0){
+                U = MCTS_U_COEFF * std::sqrt(std::log(parentN)/e->N);
+            } else {
+                U = 1e10; //Something much greater than 1.0
+            }
+            
             probs.emplace_back(Q + U);
         }
         std::discrete_distribution<int> dist(probs.begin(), probs.end());

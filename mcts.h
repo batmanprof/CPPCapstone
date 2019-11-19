@@ -18,7 +18,7 @@ struct Node {
 struct Edge {
 
     Edge(int x, int y, std::unique_ptr<Node> node=nullptr):
-      N(1e-10),W(0.0),Q(0.0),
+      N(0.0),W(0.0),Q(0.0),
       act_x(x),act_y(y),
       result_node(std::move(node)) {}
 
